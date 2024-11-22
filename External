@@ -1,0 +1,589 @@
+
+https://drive.google.com/file/d/1OCH4Xtra36SmN_JaTm433Ed2BqRSdWW2/view?usp=drivesdk
+
+Bit Stuffing:
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_SIZE 100
+
+void bitStuffing(char *input, char *output) {
+    int count = 0;  // To count consecutive '1's
+    int j = 0;      // Index for the output array
+
+    for (int i = 0; i < strlen(input); i++) {
+        output[j++] = input[i];  // Copy the current bit to output
+
+
+
+        // Count consecutive '1's
+        if (input[i] == '1') {
+            count++;
+            // If we reach 5 consecutive '1's, we need to stuff a '0'
+            if (count == 5) {
+                output[j++] = '0';  // Stuff a '0'
+                count = 0;          // Reset count after stuffing
+            }
+        } else {
+            count = 0;  // Reset count if we encounter '0'
+        }
+    }
+    output[j] = '\0';  // Null-terminate the output string
+}
+
+int main() {
+    char input[MAX_SIZE];
+    char output[MAX_SIZE * 2];  // Output size can be larger than input size due to stuffing
+
+    printf("Enter a binary string (only 0s and 1s): ");
+    scanf("%s", input);
+
+    // Perform bit stuffing
+    bitStuffing(input, output);
+
+    // Display the results
+    printf("Original string: %s\n", input);
+    printf("Stuffed string: %s\n", output);
+
+    return 0;
+}
+
+Character stuffing:
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    char temp[2];
+    char a[20];
+    char start, end;
+    char stuffed[40] = ""; // Double size for worst-case scenario
+    printf("Enter string: ");
+    scanf(" %s", a);
+
+    printf("Enter start character: ");
+    scanf(" %c", &start);
+
+    printf("Enter end character: ");
+    scanf(" %c", &end);
+
+    // Add start character at the beginning of stuffed string
+    temp[0] = start;
+    temp[1] = '\0';
+    strcat(stuffed, temp);
+
+    // Loop through the input string and perform stuffing
+    for (int i = 0; i < strlen(a); i++) {
+        temp[0] = a[i];
+        temp[1] = '\0';
+
+        if (a[i] == start || a[i] == end) {
+            strcat(stuffed, &start); // Add escape character
+        }
+        
+        strcat(stuffed, temp); // Add the actual character
+    }
+
+    // Add end character to mark the end of the stuffed string
+    temp[0] = end;
+    temp[1] = '\0';
+    strcat(stuffed, temp);
+
+    printf("Stuffed string: %s\n", stuffed);
+
+    return 0;
+}
+
+CRC:
+#include <stdio.h>
+#include <string.h>
+
+#define POLY_CRC12   0x180F  // Generator polynomial for CRC-12
+#define POLY_CRC16   0x8005  // Generator polynomial for CRC-16
+#define POLY_CRC_CCITT 0x1021 // Generator polynomial for CRC-CCITT
+
+unsigned short computeCRC(const char *input, unsigned short poly, int width) {
+    unsigned short crc = 0;
+    int len = strlen(input);
+
+    // Process each bit in the input message
+    for (int i = 0; i < len; i++) {
+        crc ^= (input[i] << (width - 8));  // Align input byte to the left of the CRC width
+        for (int j = 0; j < 8; j++) {      // Process each bit in the byte
+            if (crc & (1 << (width - 1))) {
+                crc = (crc << 1) ^ poly;   // XOR with the polynomial if leading bit is 1
+            } else {
+                crc <<= 1;                 // Shift left if leading bit is 0
+            }
+        }
+    }
+
+    // Mask to ensure CRC fits within the specified width
+    crc &= (1 << width) - 1;
+    return crc;
+}
+
+int main() {
+    char input[100];
+    
+    printf("Enter the input data (as a string of bits): ");
+    scanf("%s", input);
+
+    unsigned short crc12 = computeCRC(input, POLY_CRC12, 12);
+    unsigned short crc16 = computeCRC(input, POLY_CRC16, 16);
+    unsigned short crcCCITT = computeCRC(input, POLY_CRC_CCITT, 16);
+
+    printf("CRC-12: 0x%03X\n", crc12);
+    printf("CRC-16: 0x%04X\n", crc16);
+    printf("CRC-CCITT: 0x%04X\n", crcCCITT);
+
+    return 0;
+}
+
+SlidingWindow GoBackN Arq:
+#include<stdio.h>
+#include<stdbool.h>
+
+void sender (int start , int end , int no){
+    for(int i = start ; i < end ;i++ ){
+        if(i < no ) printf(" %d",i);
+    }
+}
+
+bool check (int x , int y){
+    return x==y;
+}
+
+void main(){
+    int window ;
+    printf("Enter window size");
+    scanf(" %d", &window);
+
+    int frame =0;
+    printf("Enter frame size");
+    scanf(" %d", &frame);
+
+    int x =0;
+    while(x < frame){
+        sender(x,window,frame);
+        printf("Acknowledgement recieved %d",x);
+        printf("\n");
+        int y;
+        scanf(" %d",&y);
+        bool var = check(x,y);
+        if(var == true) x++;
+    }
+}
+Dijkstra:
+#include <stdio.h>
+#include <limits.h>
+#include <stdbool.h>
+
+#define size 5
+
+int minDistance (int dist[],bool spl[]){
+    int idx ;
+    int minValue  = 9999;
+    for(int i =0;i< size ;i++){
+        if(!spl[i] && minValue <= dist[i]){
+            minValue = dist[i];
+            idx = i;
+        }
+    }
+    return idx;
+}
+
+void print(int dist[]){
+    for(int i =0 ; i < size ;i++){
+        printf("%d \t \t %d\n", i, dist[i]);
+    }
+}
+
+void dijkstra(int graph[size][size], int src){
+    int dist[size];
+    bool spl [size];
+
+    for(int i =0 ; i < size;i++){
+        dist[i]=9999;
+        spl[i]=false;
+    }
+
+    dist[src]=0;
+
+    for(int i =0; i <size-1;i++){
+        int u = minDistance(dist,spl);
+
+        spl[u]=true;
+        for (int v = 0; v < size; v++) {
+            if (!spl[v] && graph[u][v] && dist[u] != 9999 && dist[u] + graph[u][v] < dist[v]) {
+                dist[v] = dist[u] + graph[u][v];
+            }
+        }
+    }
+    print(dist);
+}
+
+int main() {
+    // Example graph represented as an adjacency matrix
+    int graph[size][size] = {
+        {0, 10, 0, 0, 5},
+        {10, 0, 1, 0, 2},
+        {0, 1, 0, 4, 0},
+        {0, 0, 4, 0, 3},
+        {5, 2, 0, 3, 0}
+    };
+
+    int source = 0;  // Starting point
+    dijkstra(graph, source);
+
+return 0;
+}
+Subnet broadcast:
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX 10  // Maximum number of hosts in the subnet
+#define INF 9999  // Represents infinity (no direct connection)
+
+void printBroadcastTree(int parent[], int graph[MAX][MAX], int n) {
+    printf("Edge \tWeight\n");
+    for (int i = 1; i < n; i++) {
+        printf("%d - %d \t%d \n", parent[i], i, graph[i][parent[i]]);
+    }
+}
+
+int findMinKey(int key[], bool mstSet[], int n) {
+    int min = INF, minIndex;
+    
+    for (int v = 0; v < n; v++) {
+        if (mstSet[v] == false && key[v] < min) {
+            min = key[v];
+            minIndex = v;
+        }
+    }
+    return minIndex;
+}
+
+void broadcastTree(int graph[MAX][MAX], int n) {
+    int parent[MAX];  // Array to store constructed MST
+    int key[MAX];     // Key values used to pick minimum weight edge
+    bool mstSet[MAX]; // To represent set of vertices included in MST
+
+    for (int i = 0; i < n; i++) {
+        key[i] = INF;
+        mstSet[i] = false;
+    }
+
+    key[0] = 0;        // Make key 0 so that this vertex is picked as first vertex
+    parent[0] = -1;    // First node is always the root of MST
+
+    for (int count = 0; count < n - 1; count++) {
+        int u = findMinKey(key, mstSet, n);
+
+        mstSet[u] = true;
+
+        for (int v = 0; v < n; v++) {
+            if (graph[u][v] && mstSet[v] == false && graph[u][v] < key[v]) {
+                parent[v] = u;
+                key[v] = graph[u][v];
+            }
+        }
+    }
+
+    printBroadcastTree(parent, graph, n);
+}
+
+int main() {
+    int n;  // Number of hosts in the subnet
+
+    printf("Enter the number of hosts in the subnet: ");
+    scanf("%d", &n);
+
+    int graph[MAX][MAX];
+
+    printf("Enter the adjacency matrix representing the subnet (use 0 for no direct connection):\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            scanf("%d", &graph[i][j]);
+            if (i != j && graph[i][j] == 0) {
+                graph[i][j] = INF;  // No direct connection
+            }
+        }
+    }
+
+    printf("\nBroadcast Tree for the subnet (Minimum Spanning Tree):\n");
+    broadcastTree(graph, n);
+
+    return 0;
+}
+
+Distance Vector Routing:
+
+#include <stdio.h>
+#define n 4
+#define inf 9999
+
+struct routingTable{
+    int cost[n];
+    int next[n];
+};
+
+void intialize(int cost[n][n] , struct routingTable rt[n]){
+    for(int i =0 ; i < n ;i++){
+        for(int j =0 ; j<n;j++){
+            rt[i].cost[j] = cost[i][j];
+            rt[i].next[j]=(cost[i][j] == inf || i == j)?-1:j;
+        }
+    }
+}
+
+void distanceRouting(int cost[n][n], struct routingTable rt[n]){
+    int updated ;
+    do{
+        updated =0;
+        for(int i =0 ; i < n ;i++){
+            for(int j =0 ; j < n ;j++){
+                for(int k = 0 ; k < n ;k++){
+                    if(rt[i].cost[j] > cost[i][k] + rt[k].cost[j]){
+                        rt[i].cost[j] = cost[i][k] + rt[k].cost[j];
+                        rt[i].next[j]=k;
+                        updated =1;
+                        }
+                }
+            }
+        }
+    }while(updated != 0);
+}
+void printRoutingTables(struct routingTable rt[n]) {
+    for (int i = 0; i < n; i++) {
+        printf("Routing table for node %d:\n", i);
+        printf("Destination\tCost\tNext Hop\n");
+        for (int j = 0; j < n; j++) {
+            if (i != j) {
+                printf("%d\t\t%d\t%d\n", j, rt[i].cost[j], rt[i].next[j]);
+            }
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    int cost[n][n] = {
+        {0, 2, 5, inf},
+        {2, 0, 3, 1},
+        {5, 3, 0, 2},
+        {inf, 1, 2, 0}
+    };
+
+    struct routingTable rt[n];
+    intialize(cost, rt);
+    distanceRouting(cost, rt);
+    printRoutingTables(rt);
+
+ return 0;
+}
+Encryption and decryption:
+#include <stdio.h>
+
+int main() {
+    int i, x;
+    char str[100];
+    
+    printf("\nPlease enter a string: ");
+    gets(str);  // Note: gets() is deprecated, but using it here as per the original code
+    
+    printf("\nPlease choose following options:\n");
+    printf("1: Encrypt the string\n");
+    printf("2: Decrypt the string\n");
+    scanf("%d", &x);
+    
+    switch(x) {
+        case 1:
+            // Encryption - adds 3 to each character
+            for(i = 0; i < 100 && str[i] != '\0'; i++) {
+                str[i] = str[i] + 3;
+            }
+            printf("\nEncrypted string: %s\n", str);
+            break;
+            
+        case 2:
+            // Decryption - subtracts 3 from each character
+            for(i = 0; i < 100 && str[i] != '\0'; i++) {
+                str[i] = str[i] - 3;
+            }
+            printf("\nDecrypted string: %s\n", str);
+            break;
+            
+        default:
+            printf("\nError\n");
+    }
+    
+    return 0;
+}
+
+Leaky bucket Algorithm
+#include <stdio.h>
+#include <stdlib.h>
+
+void leakyBucket(int incomingPackets[], int n, int bucketSize, int outputRate) {
+    int bucketContent = 0;  // Current content in the bucket
+    
+    printf("Time\tIncoming\tBucket\t\tOutgoing\tDropped\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t%d\t\t", i + 1, incomingPackets[i]);
+        
+        // Add incoming packets to the bucket
+        if (incomingPackets[i] + bucketContent > bucketSize) {
+            int dropped = incomingPackets[i] + bucketContent - bucketSize;
+            bucketContent = bucketSize;  // Bucket is full
+            printf("%d\t\t%d\t\t%d\n", bucketContent, outputRate, dropped);
+        } else {
+            bucketContent += incomingPackets[i];
+            printf("%d\t\t%d\t\t0\n", bucketContent, outputRate);
+        }
+        
+        // Send packets from the bucket
+        if (bucketContent >= outputRate) {
+            bucketContent -= outputRate;
+        } else {
+            bucketContent = 0;  // Empty the bucket if less than output rate
+        }
+    }
+    
+    // Drain remaining packets in the bucket
+    while (bucketContent > 0) {
+        printf("%d\t0\t\t%d\t\t%d\t\t0\n", ++n, bucketContent, outputRate);
+        if (bucketContent >= outputRate) {
+            bucketContent -= outputRate;
+        } else {
+            bucketContent = 0;
+        }
+    }
+}
+
+int main() {
+    int n, bucketSize, outputRate;
+    
+    printf("Enter the number of time intervals: ");
+    scanf("%d", &n);
+    
+    int incomingPackets[n];
+    printf("Enter the incoming packets for each time interval:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &incomingPackets[i]);
+    }
+    
+    printf("Enter the bucket size: ");
+    scanf("%d", &bucketSize);
+    
+    printf("Enter the output rate: ");
+    scanf("%d", &outputRate);
+    
+    leakyBucket(incomingPackets, n, bucketSize, outputRate);
+    
+    return 0;
+}
+
+Sorting techniques in buffers
+
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int frameNumber;  // Sequence number of the frame
+    char data[50];    // Data in the frame
+} Frame;
+
+// Function to sort frames by their frame number
+void sortFrames(Frame frames[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (frames[j].frameNumber > frames[j + 1].frameNumber) {
+                // Swap frames
+                Frame temp = frames[j];
+                frames[j] = frames[j + 1];
+                frames[j + 1] = temp;
+            }
+        }
+    }
+}
+
+int main() {
+    int n;
+    
+    printf("Enter the number of frames: ");
+    scanf("%d", &n);
+
+    Frame frames[n];
+    
+    // Input frames
+    for (int i = 0; i < n; i++) {
+        printf("Enter frame number and data for frame %d: ", i + 1);
+        scanf("%d %s", &frames[i].frameNumber, frames[i].data);
+    }
+
+    // Sorting frames by frame number
+    sortFrames(frames, n);
+
+    // Display sorted frames
+    printf("\nSorted Frames (by frame number):\n");
+    printf("Frame Number\tData\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t\t%s\n", frames[i].frameNumber, frames[i].data);
+    }
+
+    return 0;
+}
+
+token bucket algorithm
+#include <stdio.h>
+#include <stdlib.h>
+
+void tokenBucket(int tokensPerSecond, int bucketSize, int packets[], int n) {
+    int tokens = 0;  // Initial number of tokens in the bucket
+    int dropped = 0; // Dropped packets
+
+    printf("Time\tTokens\tIncoming\tAccepted\tDropped\n");
+    for (int i = 0; i < n; i++) {
+        // Add tokens to the bucket at the specified rate
+        tokens += tokensPerSecond;
+        if (tokens > bucketSize) {
+            tokens = bucketSize; // Bucket cannot hold more than its size
+        }
+
+        printf("%d\t%d\t%d\t\t", i + 1, tokens, packets[i]);
+
+        // Process the incoming packet
+        if (packets[i] <= tokens) {
+            tokens -= packets[i]; // Accept the packet
+            printf("%d\t\t%d\n", packets[i], 0);
+        } else {
+            dropped = packets[i];
+            printf("0\t\t%d\n", dropped); // Drop the packet
+        }
+    }
+}
+
+int main() {
+    int tokensPerSecond, bucketSize, n;
+
+    printf("Enter tokens generated per second: ");
+    scanf("%d", &tokensPerSecond);
+
+    printf("Enter bucket size: ");
+    scanf("%d", &bucketSize);
+
+    printf("Enter number of time slots: ");
+    scanf("%d", &n);
+
+    int packets[n];
+    printf("Enter incoming packet sizes for each time slot:\n");
+    for (int i = 0; i < n; i++) {
+        printf("Time %d: ", i + 1);
+        scanf("%d", &packets[i]);
+    }
+
+    // Simulate the token bucket algorithm
+    tokenBucket(tokensPerSecond, bucketSize, packets, n);
+
+    return 0;
+}
