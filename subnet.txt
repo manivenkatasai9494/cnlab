@@ -1,0 +1,47 @@
+
+#include <stdio.h>
+
+// Structure to represent a node (host) in the broadcast tree
+struct Node {
+    int host;
+    struct Node* left;  // Pointer to the next host (left branch)
+    struct Node* right; // Pointer to another host (right branch)
+};
+
+// Function to create a new node
+struct Node* createNode(int host) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->host = host;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+// Function to simulate broadcasting a message to all hosts
+void broadcast(struct Node* root) {
+    if (root == NULL)
+        return;
+    
+    // Print current host receiving the broadcast
+    printf("Broadcasting to host: 192.168.1.%d\n", root->host);
+
+    // Recursively broadcast to the left and right branches
+    broadcast(root->left);
+    broadcast(root->right);
+}
+
+int main() {
+    // Constructing the broadcast tree manually
+    struct Node* root = createNode(1);
+    root->left = createNode(2);
+    root->right = createNode(3);
+    root->left->left = createNode(4);
+    root->right->right = createNode(5);
+
+    // Start broadcasting from the root
+    printf("Starting broadcast from 192.168.1.1\n");
+    broadcast(root);
+
+    // Free allocated memory (not shown for simplicity)
+    return 0;
+}

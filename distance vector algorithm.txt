@@ -1,0 +1,58 @@
+#include <stdio.h>
+
+#define MAX_NODES 10
+#define INFINITY 9999
+
+void distanceVector(int cost[MAX_NODES][MAX_NODES], int n) {
+    int distance[MAX_NODES][MAX_NODES];
+    int i, j, k;
+
+    // Initialize distance table with initial cost matrix
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            distance[i][j] = cost[i][j];
+        }
+    }
+
+    // Apply Distance Vector algorithm
+    for (k = 0; k < n; k++) {
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+                if (distance[i][j] > distance[i][k] + distance[k][j]) {
+                    distance[i][j] = distance[i][k] + distance[k][j];
+                }
+            }
+        }
+    }
+
+    // Print final distance matrix
+    printf("\nDistance Matrix:\n");
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            printf("%d\t", distance[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    int cost[MAX_NODES][MAX_NODES], n;
+    int i, j;
+
+    printf("Enter the number of nodes: ");
+    scanf("%d", &n);
+
+    printf("Enter the cost matrix (use %d for no direct path):\n", INFINITY);
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            scanf("%d", &cost[i][j]);
+            if (i != j && cost[i][j] == 0) {
+                cost[i][j] = INFINITY; // No path between different nodes
+            }
+        }
+    }
+
+    distanceVector(cost, n);
+
+    return 0;
+}

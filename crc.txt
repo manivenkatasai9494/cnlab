@@ -1,0 +1,137 @@
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    int i, j, keylen, msglen;
+    char input[100], key[30], key1[30], temp[30], quot[100], rem[30];
+
+    // Input data
+    printf("Enter Data: ");
+    scanf("%s", input);
+    printf("Enter Key: ");
+    scanf("%s", key);
+
+    keylen = strlen(key);
+    msglen = strlen(input);
+    
+    // Copy key to another variable
+    strcpy(key1, key);
+
+    // Append zeros to the input based on the key length
+    for (i = 0; i < keylen - 1; i++) {
+        input[msglen + i] = '0';
+    }
+    input[msglen + keylen - 1] = '\0';
+
+    // Initialize temp
+    for (i = 0; i < keylen; i++) {
+        temp[i] = input[i];
+    }
+
+    // Perform division
+    for (i = 0; i < msglen; i++) {
+        quot[i] = temp[0];
+        
+        // Adjust key based on quotient
+        if (quot[i] == '0') {
+            for (j = 0; j < keylen; j++)
+                key[j] = '0';
+        } else {
+            for (j = 0; j < keylen; j++)
+                key[j] = key1[j];
+        }
+
+        // XOR operation
+        for (j = keylen - 1; j > 0; j--) {
+            rem[j - 1] = (temp[j] == key[j]) ? '0' : '1';
+        }
+        rem[keylen - 1] = input[i + keylen];
+        
+        // Copy remainder to temp for next step
+        strcpy(temp, rem);
+    }
+
+    // Copy remainder into rem array
+    strcpy(rem, temp);
+
+    // Print quotient and remainder
+    printf("Quotient is: ");
+    for (i = 0; i < msglen; i++) {
+        printf("%c", quot[i]);
+    }
+    printf("\nRemainder is: ");
+    for (i = 0; i < keylen - 1; i++) {
+        printf("%c", rem[i]);
+    }
+    printf("\n");
+
+    return 0;
+
+}
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    int i, j, keylen, msglen;
+    char input[100], key[30], key1[30], temp[30], quot[100], rem[30];
+
+    // Input received message and key
+    printf("Enter Received Data: ");
+    scanf("%s", input);
+    printf("Enter Key: ");
+    scanf("%s", key);
+
+    keylen = strlen(key);
+    msglen = strlen(input);
+
+    // Copy key to another variable
+    strcpy(key1, key);
+
+    // Initialize temp with the first key length of the input data
+    for (i = 0; i < keylen; i++) {
+        temp[i] = input[i];
+    }
+
+    // Perform division on the received message
+    for (i = 0; i < msglen - keylen + 1; i++) {
+        quot[i] = temp[0];
+
+        // Adjust key based on quotient
+        if (quot[i] == '0') {
+            for (j = 0; j < keylen; j++)
+                key[j] = '0';
+        } else {
+            for (j = 0; j < keylen; j++)
+                key[j] = key1[j];
+        }
+
+        // XOR operation
+        for (j = keylen - 1; j > 0; j--) {
+            rem[j - 1] = (temp[j] == key[j]) ? '0' : '1';
+        }
+        rem[keylen - 1] = input[i + keylen];
+        
+        // Copy remainder to temp for the next step
+        strcpy(temp, rem);
+    }
+
+    // Final remainder in temp
+    strcpy(rem, temp);
+
+    // Check if remainder is all zeroes
+    int error = 0;
+    for (i = 0; i < keylen - 1; i++) {
+        if (rem[i] != '0') {
+            error = 1;
+            break;
+        }
+    }
+
+    if (error == 0) {
+        printf("The received message is correct.\n");
+    } else {
+        printf("The received message is incorrect; it contains errors.\n");
+    }
+
+    return 0;
+}

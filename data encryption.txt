@@ -1,0 +1,69 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <unistd.h>  // For sleep function
+
+#define WINDOW_SIZE 4
+#define TOTAL_FRAMES 10
+
+// Function to simulate sending frames
+void send_frame(int frame) {
+    printf("Sender: Sending Frame %d\n", frame);
+}
+
+// Function to simulate receiving and acknowledging frames
+bool receive_frame(int frame) {
+    // Simulate random frame loss
+    if (rand() % 5 == 0) {
+        printf("Receiver: Frame %d lost or corrupted\n", frame);
+        return false;
+    }
+    printf("Receiver: Frame %d received successfully\n", frame);
+    return true;
+}
+
+// Function to simulate acknowledgment for a frame
+void send_ack(int frame) {
+    printf("Receiver: Acknowledgment for Frame %d sent\n", frame);
+}
+
+// Go-Back-N Protocol for flow control and error recovery
+void go_back_n() {
+    int next_frame_to_send = 0;
+    int last_ack_received = -1;
+    
+    while (last_ack_received < TOTAL_FRAMES - 1) {
+        // Send all frames in the window
+        for (int i = 0; i < WINDOW_SIZE && (next_frame_to_send < TOTAL_FRAMES); i++) {
+            send_frame(next_frame_to_send + i);
+        }
+        
+        // Wait for acknowledgments
+        for (int i = 0; i < WINDOW_SIZE && (last_ack_received < TOTAL_FRAMES - 1); i++) {
+            int current_frame = last_ack_received + 1;
+            
+            // Simulate frame reception
+            if (receive_frame(current_frame)) {
+                send_ack(current_frame);
+                last_ack_received++;
+            } else {
+                // Frame was lost, resend from last acknowledged frame
+                printf("Sender: Timeout or error, resending from Frame %d\n", last_ack_received + 1);
+                break;
+            }
+        }
+        
+        // Move the window forward
+        next_frame_to_send = last_ack_received + 1;
+        
+        // Small delay for simulation
+        sleep(1);
+    }
+}
+
+int main() {
+    srand(time(0));  // Seed for random frame loss simulation
+    printf("Starting Go-Back-N protocol simulation...\n");
+    go_back_n();
+    printf("Transmission complete.\n");
+    return 0;s

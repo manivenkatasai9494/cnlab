@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <string.h>
+
+void charStuffing(char input[], char output[]) {
+    // Special characters for framing and stuffing
+    char startFlag = 'S'; // Start of frame
+    char endFlag = 'E';   // End of frame
+    char escapeChar = 'X'; // Escape character
+
+    int j = 0;
+    output[j++] = startFlag; // Add start flag
+
+    // Process each character in the input array
+    for (int i = 0; i < strlen(input); i++) {
+        // If the character matches a flag or escape character, stuff an escape character before it
+        if (input[i] == startFlag || input[i] == endFlag || input[i] == escapeChar) {
+            output[j++] = escapeChar;
+        }
+        output[j++] = input[i]; // Add the actual character
+    }
+
+    output[j++] = endFlag; // Add end flag
+    output[j] = '\0'; // Null-terminate the output array
+}
+
+int main() {
+    char input[100];
+    char output[200]; // Ensure this is large enough to handle stuffed characters
+
+    // Get user input
+    printf("Enter the data to be transmitted: ");
+    scanf("%[^\n]", input);
+
+    // Perform character stuffing
+    charStuffing(input, output);
+
+    // Display the stuffed output
+    printf("Stuffed data: %s\n", output);
+
+    return 0;
+}

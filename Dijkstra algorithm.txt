@@ -1,0 +1,80 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX_NODES 10
+#define INFINITY 9999
+
+// Function to find the node with the minimum distance
+int findMinDistance(int distance[], bool visited[], int n) {
+    int minDistance = INFINITY;
+    int minIndex = -1;
+
+    for (int i = 0; i < n; i++) {
+        if (!visited[i] && distance[i] < minDistance) {
+            minDistance = distance[i];
+            minIndex = i;
+        }
+    }
+
+    return minIndex;
+}
+
+// Dijkstra's algorithm implementation
+void dijkstra(int graph[MAX_NODES][MAX_NODES], int n, int startNode) {
+    int distance[MAX_NODES];
+    bool visited[MAX_NODES];
+
+    // Initialize distances and visited array
+    for (int i = 0; i < n; i++) {
+        distance[i] = INFINITY;
+        visited[i] = false;
+    }
+    distance[startNode] = 0;
+
+    // Main loop of Dijkstra's algorithm
+    for (int count = 0; count < n - 1; count++) {
+        int nextNode = findMinDistance(distance, visited, n);
+
+        if (nextNode == -1) break; // No more reachable nodes
+
+        visited[nextNode] = true;
+
+        // Update distances for neighboring nodes
+        for (int i = 0; i < n; i++) {
+            if (!visited[i] && graph[nextNode][i] != INFINITY &&
+                distance[nextNode] + graph[nextNode][i] < distance[i]) {
+                distance[i] = distance[nextNode] + graph[nextNode][i];
+            }
+        }
+    }
+
+    // Print the shortest distances
+    printf("\nShortest distances from node %d:\n", startNode);
+    for (int i = 0; i < n; i++) {
+        printf("To node %d: %d\n", i, distance[i]);
+    }
+}
+
+int main() {
+    int graph[MAX_NODES][MAX_NODES], n, startNode;
+
+    printf("Enter the number of nodes: ");
+    scanf("%d", &n);
+
+    printf("Enter the adjacency matrix (use 9999 for no direct path):\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            scanf("%d", &graph[i][j]);
+            if (i != j && graph[i][j] == 0) {
+                graph[i][j] = INFINITY; // No direct path between nodes
+            }
+        }
+    }
+
+    printf("Enter the starting node (0 to %d): ", n - 1);
+    scanf("%d", &startNode);
+
+    dijkstra(graph, n, startNode);
+
+    return 0;
+}
